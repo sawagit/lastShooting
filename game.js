@@ -2,6 +2,7 @@
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
   const scoreEl = document.getElementById('score');
+  const toastEl = document.getElementById('toast');
 
   let W = 0, H = 0;
 
@@ -57,6 +58,40 @@
   let moveLeft = false;
   let moveRight = false;
   let score = 0;
+  let hitCount = 0;
+
+  const EARLY_HIT_QUOTES = ['ひとつ！', 'ふたつ！', 'みっつ！', 'よっつ！', 'いつつ！'];
+  const MILESTONE_QUOTES = {
+    10: 'たった3分で10ラストシューティングだと！',
+    20: '連邦の新型は化け物か',
+    30: '私にも敵が見える',
+    40: '戦いは数だよアニキ',
+    50: 'まだだまだ終わらんよ',
+    60: '悲しいけどこれ戦争なのよね',
+    80: '何を言っているのかわからねーと思うが',
+    90: '俺も何を言っているのかわからねー',
+    100: 'こんなに嬉しいことはない'
+  };
+  const MILESTONE_QUOTE_POOL = Object.values(MILESTONE_QUOTES);
+
+  let toastHideTimer = null;
+  function showToast(text) {
+    toastEl.textContent = `👴🏾「${text}」`;
+    toastEl.classList.add('show');
+    clearTimeout(toastHideTimer);
+    toastHideTimer = setTimeout(() => toastEl.classList.remove('show'), 1800);
+  }
+
+  function announceHit(count) {
+    if (count <= EARLY_HIT_QUOTES.length) {
+      showToast(EARLY_HIT_QUOTES[count - 1]);
+      return;
+    }
+    if (count % 10 !== 0) return;
+    const quote = MILESTONE_QUOTES[count] ||
+      MILESTONE_QUOTE_POOL[Math.floor(Math.random() * MILESTONE_QUOTE_POOL.length)];
+    showToast(quote);
+  }
 
   function resetEnemy() {
     enemy.w = 64; enemy.h = 64;
@@ -134,6 +169,13 @@
     return Math.max(300, ENEMY_SHOOT_INTERVAL * Math.pow(0.8, tier));
   }
 
+  function vibrateStun() {
+    if (navigator.vibrate) {
+      // buzzes on/off for roughly the STUN_DURATION (2s)
+      navigator.vibrate([250, 100, 250, 100, 250, 100, 250, 100, 250, 100, 250]);
+    }
+  }
+
   let lastTs = 0;
   function loop(ts) {
     if (!lastTs) lastTs = ts;
@@ -208,6 +250,7 @@
       if (rectsOverlap(b, playerRect)) {
         enemyBeams.splice(i, 1);
         playerStunnedUntil = ts + STUN_DURATION;
+        vibrateStun();
       }
     }
 
@@ -226,6 +269,8 @@
       timer: 400
     };
     setScore(score + 10);
+    hitCount += 1;
+    announceHit(hitCount);
     setTimeout(resetEnemy, 450);
   }
 

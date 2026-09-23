@@ -17,6 +17,7 @@ html, body {
 }
 
 #game-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -46,6 +47,33 @@ html, body {
   min-height: 0;
   display: block;
   background: url("img/back.png") center center / cover no-repeat;
+}
+
+#toast {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  max-width: 86%;
+  padding: 10px 18px;
+  border-radius: 20px;
+  background: rgba(20, 20, 30, 0.85);
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 #controls {
