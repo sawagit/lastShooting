@@ -46,6 +46,14 @@
   const SHOOT_COOLDOWN = 260; // ms
   let lastShotAt = -Infinity;
 
+  const enemyBeams = [];
+  const ENEMY_BEAM_W = 8, ENEMY_BEAM_H = 26, ENEMY_BEAM_SPEED = 420;
+  const ENEMY_SHOOT_INTERVAL = 3000; // ms
+  const ENEMY_SHOOT_SCORE_THRESHOLD = 50;
+  const STUN_DURATION = 2000; // ms
+  let enemyShootTimer = ENEMY_SHOOT_INTERVAL;
+  let playerStunnedUntil = 0;
+
   let moveLeft = false;
   let moveRight = false;
   let score = 0;
@@ -121,6 +129,11 @@
     return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
   }
 
+  function getEnemyShootInterval(currentScore) {
+    const tier = Math.floor(currentScore / 100);
+    return Math.max(300, ENEMY_SHOOT_INTERVAL * Math.pow(0.8, tier));
+  }
+
   let lastTs = 0;
   function loop(ts) {
     if (!lastTs) lastTs = ts;
@@ -134,10 +147,14 @@
   }
 
   function update(ts, dt) {
-    // player movement
-    if (moveLeft && !moveRight) player.x -= player.speed * dt;
-    if (moveRight && !moveLeft) player.x += player.speed * dt;
-    player.x = Math.max(0, Math.min(W - player.w, player.x));
+    const stunned = ts < playerStunnedUntil;
+
+    // player movement (disabled while stunned)
+    if (!stunned) {
+      if (moveLeft && !moveRight) player.x -= player.speed * dt;
+      if (moveRight && !moveLeft) player.x += player.speed * dt;
+      player.x = Math.max(0, Math.min(W - player.w, player.x));
+    }
 
     // enemy flutter movement
     if (ts >= nextEnemyRetargetAt) {
@@ -165,6 +182,35 @@
       }
     }
 
+    // enemy mouth-beam attack (unlocked once score exceeds threshold);
+    // interval gets 20% shorter for every 100 points scored beyond that
+    enemyShootTimer -= dt * 1000;
+    if (enemyShootTimer <= 0) {
+      enemyShootTimer = getEnemyShootInterval(score);
+      if (score > ENEMY_SHOOT_SCORE_THRESHOLD && enemy.alive) {
+        enemyBeams.push({
+          x: enemy.x + enemy.w / 2 - ENEMY_BEAM_W / 2,
+          y: enemy.y + enemy.h * 0.8,
+          w: ENEMY_BEAM_W,
+          h: ENEMY_BEAM_H
+        });
+      }
+    }
+
+    const playerRect = { x: player.x, y: player.y, w: player.w, h: player.h };
+    for (let i = enemyBeams.length - 1; i >= 0; i--) {
+      const b = enemyBeams[i];
+      b.y += ENEMY_BEAM_SPEED * dt;
+      if (b.y > H) {
+        enemyBeams.splice(i, 1);
+        continue;
+      }
+      if (rectsOverlap(b, playerRect)) {
+        enemyBeams.splice(i, 1);
+        playerStunnedUntil = ts + STUN_DURATION;
+      }
+    }
+
     // explosion timer
     if (explosion) {
       explosion.timer -= dt * 1000;
@@ -186,9 +232,12 @@
   function draw() {
     ctx.clearRect(0, 0, W, H);
 
-    // player
+    // player (shakes while stunned)
     if (playerImg.complete && playerImg.naturalWidth) {
-      ctx.drawImage(playerImg, player.x, player.y, player.w, player.h);
+      const stunned = performance.now() < playerStunnedUntil;
+      const shakeX = stunned ? (Math.random() - 0.5) * 10 : 0;
+      const shakeY = stunned ? (Math.random() - 0.5) * 10 : 0;
+      ctx.drawImage(playerImg, player.x + shakeX, player.y + shakeY, player.w, player.h);
     }
 
     // enemy
@@ -202,6 +251,16 @@
       ctx.shadowColor = '#ff5fe0';
       ctx.shadowBlur = 10;
       ctx.fillStyle = '#ff3fd8';
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.restore();
+    }
+
+    // enemy beams (red)
+    for (const b of enemyBeams) {
+      ctx.save();
+      ctx.shadowColor = '#ff6666';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#ff2222';
       ctx.fillRect(b.x, b.y, b.w, b.h);
       ctx.restore();
     }
