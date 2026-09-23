@@ -1,0 +1,107 @@
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+#game-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  height: 100vh;
+}
+
+#score-bar {
+  flex: 0 0 auto;
+  background: #1a1a2e;
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-align: center;
+  padding: 10px 0;
+  z-index: 2;
+}
+
+#score {
+  color: #ff3fd8;
+}
+
+#game {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  display: block;
+  background: url("img/back.png") center center / cover no-repeat;
+}
+
+#controls {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+  background: #1a1a2e;
+}
+
+.ctrl-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: 3px solid #4d6fff;
+  background: rgba(77, 111, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.ctrl-btn:active {
+  background: rgba(77, 111, 255, 0.4);
+}
+
+.shoot-btn {
+  border-color: #ff3b3b;
+  background: rgba(255, 59, 59, 0.15);
+}
+
+.shoot-btn:active {
+  background: rgba(255, 59, 59, 0.4);
+}
+
+.tri {
+  width: 0;
+  height: 0;
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+}
+
+.tri-left {
+  border-right: 22px solid #4d6fff;
+  margin-right: -4px;
+}
+
+.tri-right {
+  border-left: 22px solid #4d6fff;
+  margin-left: -4px;
+}
+
+.circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ff3b3b;
+}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Last Shooting</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-container">
+  <div id="score-bar">SCORE: <span id="score">0</span></div>
+  <canvas id="game"></canvas>
+  <div id="controls">
+    <button id="btn-left" class="ctrl-btn" aria-label="left"><span class="tri tri-left"></span></button>
+    <button id="btn-shoot" class="ctrl-btn shoot-btn" aria-label="shoot"><span class="circle"></span></button>
+    <button id="btn-right" class="ctrl-btn" aria-label="right"><span class="tri tri-right"></span></button>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
