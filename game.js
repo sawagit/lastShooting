@@ -21,7 +21,7 @@
   const playerImg = new Image();
   playerImg.src = 'img/player2.png';
   const enemyImg = new Image();
-  enemyImg.src = 'img/enemy.png';
+  enemyImg.src = 'img/front.png';
 
   const PLAYER_ASPECT = 96 / 178;
   const ENEMY_ASPECT = 1;
@@ -87,6 +87,17 @@
   document.getElementById('btn-shoot').addEventListener('pointerdown', (e) => {
     e.preventDefault();
     shoot();
+  });
+
+  // keyboard controls (PC): ArrowLeft/ArrowRight to move, ArrowUp to shoot
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); moveLeft = true; }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); moveRight = true; }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); shoot(); }
+  });
+  window.addEventListener('keyup', (e) => {
+    if (e.key === 'ArrowLeft') moveLeft = false;
+    else if (e.key === 'ArrowRight') moveRight = false;
   });
 
   function shoot() {
